@@ -1,0 +1,32 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Runnable Program Test
+      id: runnable-program-test
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: Runnable Program Test
+        setup-command: ''
+        command: "./test.sh"
+        input: ''
+        expected-output: Passed!
+        comparison-method: contains
+        timeout: 5
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        RUNNABLE-PROGRAM-TEST_RESULTS: "${{steps.runnable-program-test.outputs.result}}"
+      with:
+        runners: runnable-program-test
